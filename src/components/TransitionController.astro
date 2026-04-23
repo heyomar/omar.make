@@ -23,10 +23,14 @@
 
   function showGalleryView(view: HTMLElement, animate: boolean): void {
     if (prefersReduced || !animate) {
-      galleryViews.forEach(v => v.classList.add('hidden'));
+      galleryViews.forEach(v => { v.classList.add('hidden'); v.style.pointerEvents = ''; });
       view.classList.remove('hidden');
+      view.style.pointerEvents = '';
       return;
     }
+    galleryViews.forEach(v => { v.classList.add('hidden'); v.style.pointerEvents = ''; });
+    view.classList.remove('hidden');
+    view.style.pointerEvents = '';
     gsap.set(view, { display: 'flex', opacity: 0, y: 20 });
     gsap.to(view, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
   }
@@ -34,11 +38,13 @@
   function hideGalleryView(view: HTMLElement, animate: boolean): void {
     if (prefersReduced || !animate) {
       view.classList.add('hidden');
+      view.style.pointerEvents = '';
       return;
     }
+    view.style.pointerEvents = 'none';
     gsap.to(view, {
       opacity: 0, y: 20, duration: 0.3, ease: 'power3.in',
-      onComplete: () => { view.classList.add('hidden'); },
+      onComplete: () => { view.classList.add('hidden'); view.style.pointerEvents = ''; },
     });
   }
 
