@@ -1,0 +1,147 @@
+<script>
+  import gsap from 'gsap';
+  import { getState, setView, setActiveCategory } from '../lib/state';
+  import { CATEGORIES, type CategorySlug } from '../lib/categories';
+  import { createCategorySwapTimeline } from '../lib/transitions';
+  import { initHorizontalScroll } from '../lib/horizontalScroll';
+
+  const landingView = document.getElementById('landing-view')!;
+  const galleryViews = Array.from(document.querySelectorAll<HTMLElement>('.gallery-view'));
+  const tabs = Array.from(document.querySelectorAll<HTMLElement>('.category-tab'));
+  const backBtn = document.getElementById('back-to-index')!;
+
+  let currentCleanup: (() => void) | null = null;
+  let isAnimating = false;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function getGalleryView(slug: string): HTMLElement {
+    return document.getElementById(`gallery-${slug}`)!;
+  }
+
+  function showGalleryView(view: HTMLElement, animate: boolean): void {
+    if (prefersReduced || !animate) {
+      galleryViews.forEach(v => v.classList.add('hidden'));
+      view.classList.remove('hidden');
+      return;
+    }
+    gsap.set(view, { display: 'flex', opacity: 0, y: 20 });
+    gsap.to(view, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+  }
+
+  function hideGalleryView(view: HTMLElement, animate: boolean): void {
+    if (prefersReduced || !animate) {
+      view.classList.add('hidden');
+      return;
+    }
+    gsap.to(view, {
+      opacity: 0, y: 20, duration: 0.3, ease: 'power3.in',
+      onComplete: () => { view.classList.add('hidden'); },
+    });
+  }
+
+  function openCategory(slug: CategorySlug, animate = true): void {
+    if (isAnimating) return;
+    const state = getState();
+    const targetView = getGalleryView(slug);
+
+    if (state.view === 'gallery' && state.activeCategory && state.activeCategory !== slug) {
+      const outgoing = getGalleryView(state.activeCategory);
+      isAnimating = true;
+      if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+
+      if (prefersReduced) {
+        outgoing.classList.add('hidden');
+        targetView.classList.remove('hidden');
+        setActiveCategory(slug);
+        window.location.hash = slug;
+        currentCleanup = initHorizontalScroll(`strip-${slug}`, `progress-${slug}`);
+        isAnimating = false;
+      } else {
+        createCategorySwapTimeline(outgoing, targetView, () => {
+          isAnimating = false;
+          setActiveCategory(slug);
+          window.location.hash = slug;
+          currentCleanup = initHorizontalScroll(`strip-${slug}`, `progress-${slug}`);
+        });
+      }
+      return;
+    }
+
+    // Landing → Gallery
+    isAnimating = true;
+    if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+
+    if (prefersReduced) {
+      landingView.classList.add('hidden');
+      targetView.classList.remove('hidden');
+      backBtn.classList.remove('hidden');
+      setView('gallery');
+      setActiveCategory(slug);
+      window.location.hash = slug;
+      currentCleanup = initHorizontalScroll(`strip-${slug}`, `progress-${slug}`);
+      isAnimating = false;
+    } else {
+      gsap.to(landingView, {
+        opacity: 0, y: -30, duration: 0.4, ease: 'power3.in',
+        onComplete: () => {
+          landingView.classList.add('hidden');
+          showGalleryView(targetView, true);
+          gsap.set(backBtn, { display: 'block' });
+          isAnimating = false;
+          setView('gallery');
+          setActiveCategory(slug);
+          window.location.hash = slug;
+          currentCleanup = initHorizontalScroll(`strip-${slug}`, `progress-${slug}`);
+        },
+      });
+    }
+  }
+
+  function backToLanding(): void {
+    if (isAnimating) return;
+    const state = getState();
+    if (state.view !== 'gallery' || !state.activeCategory) return;
+
+    const currentView = getGalleryView(state.activeCategory);
+    isAnimating = true;
+    if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+
+    if (prefersReduced) {
+      currentView.classList.add('hidden');
+      landingView.classList.remove('hidden');
+      backBtn.classList.add('hidden');
+      setView('landing');
+      setActiveCategory(null);
+      window.location.hash = '';
+      isAnimating = false;
+    } else {
+      hideGalleryView(currentView, true);
+      landingView.classList.remove('hidden');
+      gsap.fromTo(landingView,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+          onComplete: () => {
+            backBtn.classList.add('hidden');
+            isAnimating = false;
+            setView('landing');
+            setActiveCategory(null);
+            window.location.hash = '';
+          },
+        }
+      );
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => openCategory(tab.dataset.category as CategorySlug));
+  });
+
+  backBtn.addEventListener('click', backToLanding);
+
+  // Deep-link init
+  const hash = window.location.hash.slice(1) as CategorySlug;
+  if (CATEGORIES.some(c => c.slug === hash)) {
+    openCategory(hash, false);
+  }
+</script>
