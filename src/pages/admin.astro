@@ -4,22 +4,38 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+  <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script is:inline>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof window.netlifyIdentity === 'undefined') {
-        document.body.innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Netlify Identity widget failed to load.</p>';
-        return;
-      }
-      netlifyIdentity.on('init', function(user) {
-        if (!user) {
-          netlifyIdentity.open('login');
+    (function() {
+      function initAdmin() {
+        if (typeof window.netlifyIdentity === 'undefined') {
+          document.body.innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Netlify Identity widget failed to load.</p>';
+          return;
         }
-      });
-      netlifyIdentity.init();
-    });
+
+        var hash = window.location.hash;
+        var hasToken = hash.indexOf('invite_token') !== -1 ||
+                       hash.indexOf('confirmation_token') !== -1 ||
+                       hash.indexOf('recovery_token') !== -1 ||
+                       hash.indexOf('email_change_token') !== -1;
+
+        netlifyIdentity.on('init', function(user) {
+          if (!user) {
+            netlifyIdentity.open(hasToken ? 'signup' : 'login');
+          }
+        });
+
+        netlifyIdentity.init();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAdmin);
+      } else {
+        initAdmin();
+      }
+    })();
   </script>
   <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>

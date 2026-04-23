@@ -16,26 +16,45 @@ const { title = "Portfolio" } = Astro.props;
 <body class="bg-void text-white min-h-screen">
   <slot />
   <script is:inline>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof window.netlifyIdentity === 'undefined') {
-        console.error('[Identity] Widget script failed to load');
-        return;
+    (function() {
+      function initIdentity() {
+        if (typeof window.netlifyIdentity === 'undefined') {
+          console.error('[Identity] Widget not loaded');
+          return;
+        }
+
+        var hash = window.location.hash;
+        var hasToken = hash.indexOf('invite_token') !== -1 ||
+                       hash.indexOf('confirmation_token') !== -1 ||
+                       hash.indexOf('recovery_token') !== -1 ||
+                       hash.indexOf('email_change_token') !== -1;
+
+        if (hasToken) {
+          console.log('[Identity] Token found in URL, opening widget');
+          netlifyIdentity.open(hasToken.indexOf('invite') !== -1 ? 'signup' : 'login');
+        }
+
+        netlifyIdentity.on('init', function(user) {
+          if (user) {
+            if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
+              window.location.href = '/admin/';
+            }
+          } else {
+            netlifyIdentity.on('login', function() {
+              window.location.href = '/admin/';
+            });
+          }
+        });
+
+        netlifyIdentity.init();
       }
 
-      netlifyIdentity.on('init', function(user) {
-        if (user) {
-          if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
-            window.location.href = '/admin/';
-          }
-        } else {
-          netlifyIdentity.on('login', function() {
-            window.location.href = '/admin/';
-          });
-        }
-      });
-
-      netlifyIdentity.init();
-    });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initIdentity);
+      } else {
+        initIdentity();
+      }
+    })();
   </script>
 </body>
 </html>
