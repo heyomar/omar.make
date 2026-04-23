@@ -16,16 +16,36 @@ const { title = "Portfolio" } = Astro.props;
 <body class="bg-void text-white min-h-screen">
   <slot />
   <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on('init', (user) => {
-        if (!user) {
-          window.netlifyIdentity.on('login', () => {
-            document.location.href = '/admin/';
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.netlifyIdentity === 'undefined') {
+        console.error('[Identity] Widget script failed to load');
+        return;
+      }
+
+      // Already logged in? Redirect to admin
+      netlifyIdentity.on('init', function(user) {
+        if (user) {
+          console.log('[Identity] Already logged in as', user.email);
+          if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
+            window.location.href = '/admin/';
+          }
+        } else {
+          console.log('[Identity] No active session');
+          // Listen for login and redirect
+          netlifyIdentity.on('login', function() {
+            window.location.href = '/admin/';
           });
         }
       });
-      window.netlifyIdentity.init();
-    }
+
+      // Handle invite/confirmation tokens in URL
+      var hash = window.location.hash;
+      if (hash.indexOf('invite_token') !== -1 || hash.indexOf('confirmation_token') !== -1 || hash.indexOf('recovery_token') !== -1) {
+        console.log('[Identity] Token detected in URL, processing...');
+      }
+
+      netlifyIdentity.init();
+    });
   </script>
 </body>
 </html>

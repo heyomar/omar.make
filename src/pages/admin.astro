@@ -8,16 +8,24 @@
 </head>
 <body>
   <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on('init', (user) => {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.netlifyIdentity === 'undefined') {
+        console.error('[Identity] Widget script failed to load');
+        document.body.innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Netlify Identity widget failed to load. Check your network connection.</p>';
+        return;
+      }
+
+      netlifyIdentity.on('init', function(user) {
         if (!user) {
-          window.netlifyIdentity.on('login', () => {
-            document.location.href = '/admin/';
-          });
+          console.log('[Identity] Not logged in, opening login modal');
+          netlifyIdentity.open('login');
+        } else {
+          console.log('[Identity] Logged in as', user.email);
         }
       });
-      window.netlifyIdentity.init();
-    }
+
+      netlifyIdentity.init();
+    });
   </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
