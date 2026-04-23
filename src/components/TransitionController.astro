@@ -9,6 +9,9 @@
   const galleryViews = Array.from(document.querySelectorAll<HTMLElement>('.gallery-view'));
   const tabs = Array.from(document.querySelectorAll<HTMLElement>('.category-tab'));
   const backBtn = document.getElementById('back-to-index')!;
+  const headerLogo = document.getElementById('header-logo')!;
+  const headerNav = document.getElementById('header-nav')!;
+  const headerNavItems = Array.from(document.querySelectorAll<HTMLElement>('.header-nav-item'));
 
   let currentCleanup: (() => void) | null = null;
   let isAnimating = false;
@@ -75,6 +78,8 @@
       landingView.classList.add('hidden');
       targetView.classList.remove('hidden');
       backBtn.classList.remove('hidden');
+      headerNav.classList.remove('hidden');
+      headerNav.classList.add('flex');
       setView('gallery');
       setActiveCategory(slug);
       window.location.hash = slug;
@@ -87,6 +92,8 @@
           landingView.classList.add('hidden');
           showGalleryView(targetView, true);
           gsap.set(backBtn, { display: 'block' });
+          headerNav.classList.remove('hidden');
+          headerNav.classList.add('flex');
           isAnimating = false;
           setView('gallery');
           setActiveCategory(slug);
@@ -110,6 +117,8 @@
       currentView.classList.add('hidden');
       landingView.classList.remove('hidden');
       backBtn.classList.add('hidden');
+      headerNav.classList.add('hidden');
+      headerNav.classList.remove('flex');
       setView('landing');
       setActiveCategory(null);
       window.location.hash = '';
@@ -117,6 +126,8 @@
     } else {
       hideGalleryView(currentView, true);
       landingView.classList.remove('hidden');
+      headerNav.classList.add('hidden');
+      headerNav.classList.remove('flex');
       gsap.fromTo(landingView,
         { opacity: 0, y: 30 },
         {
@@ -137,11 +148,22 @@
     tab.addEventListener('click', () => openCategory(tab.dataset.category as CategorySlug));
   });
 
+  headerNavItems.forEach(item => {
+    item.addEventListener('click', () => openCategory(item.dataset.navCategory as CategorySlug));
+  });
+
+  headerLogo.addEventListener('click', (e) => {
+    e.preventDefault();
+    backToLanding();
+  });
+
   backBtn.addEventListener('click', backToLanding);
 
   // Deep-link init
   const hash = window.location.hash.slice(1) as CategorySlug;
   if (CATEGORIES.some(c => c.slug === hash)) {
+    headerNav.classList.remove('hidden');
+    headerNav.classList.add('flex');
     openCategory(hash, false);
   }
 </script>

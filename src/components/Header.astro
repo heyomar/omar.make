@@ -1,6 +1,17 @@
 ---
+import { CATEGORIES } from '../lib/categories';
 ---
 
-<header class="fixed top-0 left-0 right-0 z-[60] h-12 flex items-center px-[clamp(2rem,5vw,6rem)] border-b border-flame/10 bg-void/80 backdrop-blur-sm">
-  <span class="font-body text-sm tracking-wider uppercase text-white/60">Portfolio</span>
+<header id="site-header" class="fixed top-0 left-0 right-0 z-[60] h-12 flex items-center justify-between px-[clamp(2rem,5vw,6rem)] border-b border-flame/10 bg-void/80 backdrop-blur-sm transition-all duration-300">
+  <a href="/" id="header-logo" class="font-body text-sm tracking-wider uppercase text-white/60 hover:text-flame transition-colors">Portfolio</a>
+  <nav id="header-nav" class="hidden gap-6">
+    {CATEGORIES.map((cat) => (
+      <button
+        class="header-nav-item font-body text-[10px] tracking-wider uppercase text-white/40 hover:text-flame transition-colors"
+        data-nav-category={cat.slug}
+      >
+        {cat.name}
+      </button>
+    ))}
+  </nav>
 </header>
