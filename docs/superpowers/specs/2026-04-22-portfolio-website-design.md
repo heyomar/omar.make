@@ -89,6 +89,7 @@ No additional colors. Work imagery provides all chromatic variety.
 2. **200ms–600ms:** Unclicked tabs slide downward and fade to `opacity: 0.3`, stacking into a compact secondary index (~8vh each).
 3. **400ms–800ms:** Horizontal project strip fades in below the header with a slight `translateY(20px)` → `0` entrance.
 4. **URL updates** to `/#<category-slug>` for deep-linking.
+- **Direct deep-link behavior:** Visiting `/#<category-slug>` directly initializes the page in the active gallery state for that category (not the landing index). The GSAP transition controller reads the hash on mount and skips the landing→gallery entrance animation, rendering the target category's project strip immediately.
 
 ### 3.2 Active State — Project Gallery
 
@@ -125,7 +126,7 @@ No additional colors. Work imagery provides all chromatic variety.
 
 #### Secondary Index
 - Below the scroll strip, the remaining 5 categories are visible at 30% opacity
-- Clicking any secondary tab swaps the active project strip with a matching GSAP transition (crossfade + slight horizontal slide)
+- Clicking any secondary tab swaps the active project strip with a matching GSAP transition (crossfade + slight horizontal slide). The horizontal scroll position resets to `scrollLeft = 0` on each category swap.
 - Active secondary tab highlights to full opacity + flame color
 
 #### Scroll Progress Indicator
@@ -225,7 +226,7 @@ Projects are ordered by `order` field ascending, then `year` descending.
 │   │   └── config.yml          # Netlify CMS configuration
 │   └── uploads/                # CMS image uploads
 ├── astro.config.mjs
-├── tailwind.config.js          # Tailwind v4 (or inline @theme in CSS)
+├── src/styles/global.css       # Tailwind v4 with @theme (CSS-first, no tailwind.config.js)
 ├── netlify.toml
 └── package.json
 ```
@@ -246,11 +247,12 @@ Uses CSS-first `@theme` in `src/styles/global.css`:
 @theme {
   --color-void: #0A0A0A;
   --color-flame: #FF3B00;
-  --color-void-text: #FFFFFF;
   --font-display: "Newsreader", serif;
   --font-body: "Inter", sans-serif;
 }
 ```
+
+**Note on palette:** White (`#FFFFFF`) is used only as default accessible text on the void background. It is not a "design color" — the intentional 2-color palette is void + flame. All expressive color comes from work imagery.
 
 ### 6.4 Netlify CMS Setup
 
@@ -263,7 +265,7 @@ Uses CSS-first `@theme` in `src/styles/global.css`:
 
 - `astro build` → static output to `dist/`
 - Netlify deploy with build command `npm run build`
-- `netlify.toml` configures SPA fallback for deep links to `/#` hashes
+- Hash-based routing is client-side only; no server fallback needed for `/#` routes
 
 ---
 
