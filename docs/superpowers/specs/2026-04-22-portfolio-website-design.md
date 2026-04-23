@@ -74,7 +74,7 @@ No additional colors. Work imagery provides all chromatic variety.
 └──────────────────────────────────────────────┘
 ```
 
-- Each tab is ~60–80vh tall, full viewport width.
+- Each tab is ~60–80vh tall, full viewport width. The landing index scrolls vertically (native `overflow-y: auto`).
 - Category name centered or left-aligned within padding.
 - Thin horizontal rule below each name.
 
@@ -228,7 +228,6 @@ Projects are ordered by `order` field ascending, then `year` descending.
 │   │   └── config.yml          # Netlify CMS configuration
 │   └── uploads/                # CMS image uploads
 ├── astro.config.mjs
-├── src/styles/global.css       # Tailwind v4 with @theme (CSS-first, no tailwind.config.js)
 ├── netlify.toml
 └── package.json
 ```
@@ -236,8 +235,8 @@ Projects are ordered by `order` field ascending, then `year` descending.
 ### 6.2 Astro Islands
 
 - **CategoryIndex** — static Astro component, no hydration needed
-- **ProjectStrip** — static shell, but inner scroll enhancement hydrates with `client:visible` (loads GSAP only when scrolled into view)
-- **Transitions** — `client:load` on the root layout; lightweight GSAP controller that orchestrates tab click → state morph
+- **ProjectStrip** — static shell; horizontal scroll enhancement hydrates with `client:visible` on desktop only
+- **Transitions controller** — `client:load` on the root layout; lightweight GSAP core loaded on **all devices** to handle tab transitions and deep-link state initialization. Heavy ScrollTrigger / inertia plugins are loaded conditionally on desktop only.
 
 ### 6.3 Tailwind CSS v4 Configuration
 
@@ -287,7 +286,7 @@ Uses CSS-first `@theme` in `src/styles/global.css`:
 - Largest Contentful Paint: < 2.5s
 - No layout shift on tab transitions (all animations use `transform`/`opacity`)
 - Images: Astro `<Image />` component with responsive srcsets, WebP/AVIF output
-- GSAP loaded only on desktop; mobile uses native scroll + CSS transitions
+- GSAP core loaded on all devices for tab transitions; ScrollTrigger / inertia plugins desktop-only
 
 ---
 
