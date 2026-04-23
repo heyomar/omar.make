@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+interface Props {
+  id: string;
+  projects: CollectionEntry<'projects'>[];
+}
+const { id, projects } = Astro.props;
+---
+
+<section
+  id={id}
+  class="project-strip w-full overflow-x-auto"
+  style="-webkit-overflow-scrolling: touch;"
+>
+  <div class="project-strip-inner flex gap-[4vw] px-[clamp(2rem,5vw,6rem)] pb-8">
+    {projects.map((p) => (
+      <ProjectCard
+        title={p.data.title}
+        year={p.data.year}
+        featuredImage={p.data.featuredImage}
+        externalUrl={p.data.externalUrl}
+      />
+    ))}
+  </div>
+</section>

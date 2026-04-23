@@ -1,0 +1,28 @@
+---
+import type { Category } from '../lib/categories';
+interface Props { category: Category; isSecondary?: boolean; }
+const { category, isSecondary = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    'category-tab group cursor-pointer border-b border-flame/20 transition-all duration-300',
+    'flex items-center px-[clamp(2rem,5vw,6rem)]',
+    isSecondary ? 'h-[8vh] opacity-30 hover:opacity-100' : 'min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh]',
+  ]}
+  data-category={category.slug}
+  role="button" tabindex="0"
+>
+  <h2
+    class:list={[
+      'font-display transition-all duration-300 group-hover:text-flame group-hover:translate-x-[1vw]',
+      isSecondary ? 'text-[clamp(1.5rem,4vw,3rem)]' : 'text-[clamp(4rem,12vw,10rem)] leading-[0.95]',
+    ]}
+  >{category.name}</h2>
+</div>
+
+<style>
+  .category-tab:hover {
+    border-color: rgba(255, 59, 0, 0.5);
+  }
+</style>

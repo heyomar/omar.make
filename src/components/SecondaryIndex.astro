@@ -1,0 +1,12 @@
+---
+import { CATEGORIES } from '../lib/categories';
+import CategoryTab from './CategoryTab.astro';
+interface Props { activeSlug: string; }
+const { activeSlug } = Astro.props;
+---
+
+<section id="secondary-index" class="flex flex-col w-full">
+  {CATEGORIES.filter(c => c.slug !== activeSlug).map((cat) => (
+    <CategoryTab category={cat} isSecondary />
+  ))}
+</section>

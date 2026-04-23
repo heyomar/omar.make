@@ -1,0 +1,10 @@
+---
+interface Props { id?: string; }
+const { id = 'scroll-progress' } = Astro.props;
+---
+
+<div id={id} class="w-full px-[clamp(2rem,5vw,6rem)]">
+  <div class="h-[2px] w-full bg-flame/10 relative overflow-hidden">
+    <div id={`${id}-fill`} class="h-full bg-flame absolute left-0 top-0" style="width: 0%;" />
+  </div>
+</div>
