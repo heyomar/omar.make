@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
 import SecondaryIndex from '../components/SecondaryIndex.astro';
 import ProjectStrip from '../components/ProjectStrip.astro';
@@ -30,17 +32,18 @@ const byCategory = Object.fromEntries(
 ---
 
 <BaseLayout>
+  <Header />
   <main class="relative">
     <!-- Landing view -->
-    <div id="landing-view" class="h-screen overflow-hidden">
+    <div id="landing-view" class="h-[calc(100vh-5rem)] mt-12 overflow-hidden">
       <CategoryIndex />
     </div>
 
-    <!-- Gallery views — one per category, full-screen overlays -->
+    <!-- Gallery views — one per category, between header and footer -->
     {CATEGORIES.map((cat) => (
       <div
         id={`gallery-${cat.slug}`}
-        class="gallery-view hidden fixed inset-0 bg-void z-10 flex-col"
+        class="gallery-view hidden fixed top-12 bottom-8 left-0 right-0 bg-void z-10 flex-col"
       >
         <!-- Compact header -->
         <div class="h-[15vh] flex items-center px-[clamp(2rem,5vw,6rem)] border-b border-flame/20 shrink-0">
@@ -67,4 +70,5 @@ const byCategory = Object.fromEntries(
     <BackToIndex />
     <TransitionController />
   </main>
+  <Footer />
 </BaseLayout>
