@@ -4,30 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+  <!-- Decap CMS requires the Identity widget for its UI -->
   <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script>
-    import { handleAuthCallback, getUser } from '@netlify/identity';
-
-    async function initAdmin() {
-      // Process any tokens first
-      const result = await handleAuthCallback();
-      if (result) {
-        console.log('[Identity] Admin token processed:', result.type);
-      }
-
-      // Check auth state
-      const user = await getUser();
-      if (!user) {
-        // Not logged in — open the widget login modal
-        if (window.netlifyIdentity) {
-          window.netlifyIdentity.open('login');
+  <!-- Standard Decap CMS redirect: send users to /admin/ after login -->
+  <script is:inline>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", function(user) {
+        if (!user) {
+          window.netlifyIdentity.on("login", function() {
+            document.location.href = "/admin/";
+          });
         }
-      }
+      });
     }
-
-    initAdmin().catch(console.error);
   </script>
   <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>

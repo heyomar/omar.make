@@ -17,25 +17,30 @@ const { title = "Portfolio" } = Astro.props;
   <script>
     import { handleAuthCallback, getUser } from '@netlify/identity';
 
-    async function init() {
-      // Process any invite/confirmation/recovery tokens in URL hash
-      const result = await handleAuthCallback();
-      if (result) {
-        console.log('[Identity] Token processed:', result.type);
-        window.location.href = '/admin/';
-        return;
-      }
+    async function initIdentity() {
+      try {
+        // Process invite/confirmation/recovery tokens from URL hash.
+        // This makes a headless API call — no UI modal is shown.
+        const result = await handleAuthCallback();
+        if (result) {
+          console.log('[Identity] Token processed:', result.type, result.user.email);
+          // Token was valid — user is now authenticated. Redirect to admin.
+          window.location.href = '/admin/';
+          return;
+        }
 
-      // If already logged in, redirect to admin
-      const user = await getUser();
-      if (user) {
-        if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
+        // No token in URL. Check if already logged in.
+        const user = await getUser();
+        if (user) {
+          console.log('[Identity] Already logged in:', user.email);
           window.location.href = '/admin/';
         }
+      } catch (err) {
+        console.error('[Identity] Error:', err);
       }
     }
 
-    init().catch(console.error);
+    initIdentity();
   </script>
 </body>
 </html>
