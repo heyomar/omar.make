@@ -4,3 +4,14 @@ dist/
 .env
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Local Netlify folder
+.netlify
+
+# macOS
+.DS_Store
+
+# Project management / review artifacts
+docs/superpowers/plans/review-result.md
+docs/superpowers/specs/review-result*.md
+progress.md
