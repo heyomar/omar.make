@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CategoryIndex from '../components/CategoryIndex.astro';
+import SecondaryIndex from '../components/SecondaryIndex.astro';
+import ProjectStrip from '../components/ProjectStrip.astro';
+import ScrollProgress from '../components/ScrollProgress.astro';
+import BackToIndex from '../components/BackToIndex.astro';
+import TransitionController from '../components/TransitionController.astro';
+import { CATEGORIES } from '../lib/categories';
+import '../styles/global.css';
+
+const allProjects = await getCollection('projects');
+
+function sortProjects(projects: typeof allProjects) {
+  return [...projects].sort((a, b) => {
+    const orderA = a.data.order ?? Infinity;
+    const orderB = b.data.order ?? Infinity;
+    if (orderA !== orderB) return orderA - orderB;
+    return b.data.year - a.data.year;
+  });
+}
+
+const byCategory = Object.fromEntries(
+  CATEGORIES.map(cat => [
+    cat.slug,
+    sortProjects(allProjects.filter(p => p.data.category === cat.slug)),
+  ])
+);
+---
+
+<BaseLayout>
+  <main class="relative">
+    <!-- Landing view -->
+    <div id="landing-view">
+      <CategoryIndex />
+    </div>
+
+    <!-- Gallery views — one per category, full-screen overlays -->
+    {CATEGORIES.map((cat) => (
+      <div
+        id={`gallery-${cat.slug}`}
+        class="gallery-view hidden fixed inset-0 bg-void z-10 flex-col"
+      >
+        <!-- Compact header -->
+        <div class="h-[15vh] flex items-center px-[clamp(2rem,5vw,6rem)] border-b border-flame/20 shrink-0">
+          <h2 class="font-display text-[clamp(1.5rem,4vw,3rem)]">{cat.name}</h2>
+        </div>
+
+        <!-- Project strip -->
+        <div class="flex-1 flex items-center min-h-0 overflow-hidden">
+          <ProjectStrip id={`strip-${cat.slug}`} projects={byCategory[cat.slug]} />
+        </div>
+
+        <!-- Scroll progress -->
+        <div class="shrink-0">
+          <ScrollProgress id={`progress-${cat.slug}`} />
+        </div>
+
+        <!-- Secondary index -->
+        <div class="shrink-0 border-t border-flame/20">
+          <SecondaryIndex activeSlug={cat.slug} />
+        </div>
+      </div>
+    ))}
+
+    <BackToIndex />
+    <TransitionController />
+  </main>
+</BaseLayout>
