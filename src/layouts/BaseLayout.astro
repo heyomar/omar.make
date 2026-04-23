@@ -11,50 +11,31 @@ const { title = "Portfolio" } = Astro.props;
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Newsreader:wght@400;700&display=swap" rel="stylesheet" />
-  <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body class="bg-void text-white min-h-screen">
   <slot />
-  <script is:inline>
-    (function() {
-      function initIdentity() {
-        if (typeof window.netlifyIdentity === 'undefined') {
-          console.error('[Identity] Widget not loaded');
-          return;
-        }
+  <script>
+    import { handleAuthCallback, getUser } from '@netlify/identity';
 
-        var hash = window.location.hash;
-        var hasToken = hash.indexOf('invite_token') !== -1 ||
-                       hash.indexOf('confirmation_token') !== -1 ||
-                       hash.indexOf('recovery_token') !== -1 ||
-                       hash.indexOf('email_change_token') !== -1;
-
-        if (hasToken) {
-          console.log('[Identity] Token found in URL, opening widget');
-          netlifyIdentity.open(hasToken.indexOf('invite') !== -1 ? 'signup' : 'login');
-        }
-
-        netlifyIdentity.on('init', function(user) {
-          if (user) {
-            if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
-              window.location.href = '/admin/';
-            }
-          } else {
-            netlifyIdentity.on('login', function() {
-              window.location.href = '/admin/';
-            });
-          }
-        });
-
-        netlifyIdentity.init();
+    async function init() {
+      // Process any invite/confirmation/recovery tokens in URL hash
+      const result = await handleAuthCallback();
+      if (result) {
+        console.log('[Identity] Token processed:', result.type);
+        window.location.href = '/admin/';
+        return;
       }
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initIdentity);
-      } else {
-        initIdentity();
+      // If already logged in, redirect to admin
+      const user = await getUser();
+      if (user) {
+        if (window.location.pathname !== '/admin/' && window.location.pathname !== '/admin') {
+          window.location.href = '/admin/';
+        }
       }
-    })();
+    }
+
+    init().catch(console.error);
   </script>
 </body>
 </html>

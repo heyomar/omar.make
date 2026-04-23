@@ -7,35 +7,27 @@
   <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script is:inline>
-    (function() {
-      function initAdmin() {
-        if (typeof window.netlifyIdentity === 'undefined') {
-          document.body.innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Netlify Identity widget failed to load.</p>';
-          return;
+  <script>
+    import { handleAuthCallback, getUser } from '@netlify/identity';
+
+    async function initAdmin() {
+      // Process any tokens first
+      const result = await handleAuthCallback();
+      if (result) {
+        console.log('[Identity] Admin token processed:', result.type);
+      }
+
+      // Check auth state
+      const user = await getUser();
+      if (!user) {
+        // Not logged in — open the widget login modal
+        if (window.netlifyIdentity) {
+          window.netlifyIdentity.open('login');
         }
-
-        var hash = window.location.hash;
-        var hasToken = hash.indexOf('invite_token') !== -1 ||
-                       hash.indexOf('confirmation_token') !== -1 ||
-                       hash.indexOf('recovery_token') !== -1 ||
-                       hash.indexOf('email_change_token') !== -1;
-
-        netlifyIdentity.on('init', function(user) {
-          if (!user) {
-            netlifyIdentity.open(hasToken ? 'signup' : 'login');
-          }
-        });
-
-        netlifyIdentity.init();
       }
+    }
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAdmin);
-      } else {
-        initAdmin();
-      }
-    })();
+    initAdmin().catch(console.error);
   </script>
   <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
