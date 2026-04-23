@@ -118,16 +118,18 @@ No additional colors. Work imagery provides all chromatic variety.
 ```
 
 #### Horizontal Scroll Strip
-- Container: `overflow-x: auto` with `scroll-snap-type: x mandatory`
-- Each card: `scroll-snap-align: start`, width `70vw` (desktop) / `85vw` (mobile)
-- GSAP ScrollTrigger enhances with inertia and snap-to-card behavior on desktop
+- Container: `overflow-x: auto`
+- Each card: width `70vw` (desktop) / `85vw` (mobile)
+- **Desktop:** GSAP ScrollTrigger handles inertia and programmatic snap-to-card. CSS `scroll-snap-type` is **disabled** on desktop to avoid conflict.
+- **Mobile:** CSS `scroll-snap-type: x mandatory` with `scroll-snap-align: start` on each card. GSAP snap is **disabled** on mobile.
 - Gap between cards: `4vw`
 - Cards are vertical stacks: image → title → year
+- **Card click behavior:** Cards with `externalUrl` navigate to that URL (new tab). Cards without `externalUrl` are non-interactive for MVP (detail pages deferred per Section 9).
 
 #### Secondary Index
 - Below the scroll strip, the remaining 5 categories are visible at 30% opacity
 - Clicking any secondary tab swaps the active project strip with a matching GSAP transition (crossfade + slight horizontal slide). The horizontal scroll position resets to `scrollLeft = 0` on each category swap.
-- Active secondary tab highlights to full opacity + flame color
+- **Hover on secondary tab:** text and rule shift to full opacity + flame color (same hover treatment as landing state). The clicked tab then animates to the header, and the previous header tab animates down into the secondary index.
 
 #### Scroll Progress Indicator
 - Thin horizontal line at bottom of scroll strip, full container width
