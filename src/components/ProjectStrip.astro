@@ -10,17 +10,19 @@ const { id, projects } = Astro.props;
 
 <section
   id={id}
-  class="project-strip w-full overflow-x-auto"
-  style="-webkit-overflow-scrolling: touch;"
+  class="project-strip w-full overflow-x-auto md:scroll-snap-none"
+  style="-webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;"
 >
   <div class="project-strip-inner flex gap-[4vw] px-[clamp(2rem,5vw,6rem)] pb-8">
     {projects.map((p) => (
-      <ProjectCard
-        title={p.data.title}
-        year={p.data.year}
-        featuredImage={p.data.featuredImage}
-        externalUrl={p.data.externalUrl}
-      />
+      <div style="scroll-snap-align: start;">
+        <ProjectCard
+          title={p.data.title}
+          year={p.data.year}
+          featuredImage={p.data.featuredImage}
+          externalUrl={p.data.externalUrl}
+        />
+      </div>
     ))}
   </div>
 </section>
