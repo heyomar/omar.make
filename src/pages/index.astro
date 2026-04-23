@@ -4,7 +4,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
-import SecondaryIndex from '../components/SecondaryIndex.astro';
 import ProjectStrip from '../components/ProjectStrip.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import BackToIndex from '../components/BackToIndex.astro';
@@ -60,10 +59,6 @@ const byCategory = Object.fromEntries(
           <ScrollProgress id={`progress-${cat.slug}`} />
         </div>
 
-        <!-- Secondary index -->
-        <div class="shrink-0 border-t border-flame/20">
-          <SecondaryIndex activeSlug={cat.slug} />
-        </div>
       </div>
     ))}
 
