@@ -3,6 +3,6 @@ import { CATEGORIES } from '../lib/categories';
 import CategoryTab from './CategoryTab.astro';
 ---
 
-<section id="category-index" class="flex flex-col w-full">
+<section id="category-index" class="flex flex-col w-full h-screen overflow-hidden">
   {CATEGORIES.map((cat) => <CategoryTab category={cat} />)}
 </section>
