@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Newsreader:wght@400;700&display=swap');
+
+@theme {
+  --color-void: #0A0A0A;
+  --color-flame: #FF3B00;
+  --font-display: "Newsreader", serif;
+  --font-body: "Inter", sans-serif;
+}
+
+@layer base {
+  html {
+    background-color: #0A0A0A;
+    color: #FFFFFF;
+    font-family: "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background-color: #FF3B00;
+    color: #0A0A0A;
+  }
+}
